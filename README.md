@@ -9,3 +9,8 @@ Feb 10/2016
   shout out to this guy for making some awesome tutorials.
 
 -----------------------------------------------------------------------------------------------------------------------------
+Feb 11/2016
+- Second commit with some added scripts to randomly generate hex tiles and place them in the world
+- put them in corresponding location.
+- Applied layered architecture here. Place data in data_layer, controllers and game logics in controller_layer, and art asset
+  in the art asset folder.

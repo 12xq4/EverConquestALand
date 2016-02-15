@@ -30,6 +30,7 @@ public class Map : MonoBehaviour {
 				else
                     hex_current.transform.position = new Vector3(x * width_offset,0,z * z_offset);
 
+                hex_current.isStatic = true;
                 hex_current.transform.SetParent(this.transform, true);
 
                 // Register the callback function for tiles here, using the redisplay method in Map.

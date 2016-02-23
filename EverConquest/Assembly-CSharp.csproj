@@ -45,7 +45,9 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
+     <Compile Include="Assets\Scripts\Controller\Hex.cs" />
      <Compile Include="Assets\Scripts\Controller\Map.cs" />
+     <Compile Include="Assets\Scripts\Controller\MouseController.cs" />
      <Compile Include="Assets\Scripts\Data_Model\Tile.cs" />
      <Compile Include="Assets\Scripts\Data_Model\World.cs" />
  <Reference Include="UnityEngine.UI">

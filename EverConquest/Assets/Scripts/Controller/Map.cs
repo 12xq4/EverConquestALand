@@ -31,6 +31,11 @@ public class Map : MonoBehaviour {
                     hex_current.transform.position = new Vector3(x * width_offset,0,z * z_offset);
 
                 hex_current.isStatic = true;
+				// Add a hex component for each hex tile at run time.
+				// For ease of reference relativity.
+				hex_current.AddComponent<Hex> ();
+				hex_current.GetComponent<Hex> ().tile_rep = tile_data;
+				// Arrange in a clean hierachy, set parent of all hex tiles to the map.
                 hex_current.transform.SetParent(this.transform, true);
 
                 // Register the callback function for tiles here, using the redisplay method in Map.

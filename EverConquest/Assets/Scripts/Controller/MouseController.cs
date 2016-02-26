@@ -34,7 +34,9 @@ public class MouseController : MonoBehaviour {
 			// This is a hack and it is dumb, have the hex script on the top level and hard code it to trace all the way back.
 
 			UpdateCameraPosition (hitObject);
-			if (hitObject.transform.GetComponent<Hex>() != null)
+
+			// Check if the object clicked is a type tile object.
+			if (hitObject.tag == "Tile")
 				OnMouseOverHex (hitObject);
 
         }
@@ -65,6 +67,14 @@ public class MouseController : MonoBehaviour {
 				mr.material.color = Color.white;
 			else
 				mr.material.color = Color.blue;
+
+			// This part is hard coded. Need better design. Hex is probably not even needed.
+			Tile[] neighbours = hitObject.transform.parent.transform.parent.GetComponent<Hex> ().tile_rep.GetNeighbours();
+			foreach (Tile t in neighbours) {
+				GameObject tile_neighbour = GameObject.Find ("Hex (" + t.XCoord + "," + t.YCoord + ")");
+				if (tile_neighbour != null && tile_neighbour.GetComponentInChildren<MeshRenderer>().material.color == Color.white)
+					tile_neighbour.GetComponentInChildren<MeshRenderer>().material.color = Color.yellow;
+			}
 		}
 	}
 }

@@ -41,6 +41,12 @@ public class World {
         {
             Debug.Log("Check your coordinates, you requested a tile that is out of bound.");
         }
-        return tiles[x, y];
+		/*
+		if (tiles [x, y] == null)
+			Debug.Log ("Tile at " + x + "," + y + "is null");
+		else
+			Debug.Log ("Tile has been returned.");
+		*/
+        return tiles[x,y];
     }
 }

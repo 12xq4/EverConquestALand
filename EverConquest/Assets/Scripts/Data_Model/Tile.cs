@@ -30,14 +30,53 @@ public class Tile {
         }
     }
     
-    World world;
+	World world;
+
+	public World World {
+		get {
+			return world;
+		}
+		protected set {
+			world = value;
+		}
+	}
+
     public int XCoord { get; protected set; }
     public int YCoord { get; protected set; }
 
     public Tile (World world, int x, int y) {
-	    this.world = world;
+	    World = world;
 		XCoord = x;
 		YCoord = y;
+	}
+
+	public Tile[] GetNeighbours() {
+		ArrayList tiles = new ArrayList();
+		if (XCoord-1 >= 0)
+			tiles.Add (world.GetTileAt (XCoord-1, YCoord));
+		if (XCoord+1 <= world.Width)
+			tiles.Add (world.GetTileAt (XCoord + 1, YCoord));
+		if (XCoord % 2 == 0) {
+			if (XCoord-1 >= 0 && YCoord+1 <= world.Height)
+				tiles.Add (world.GetTileAt (XCoord - 1, YCoord + 1));
+			if (YCoord+1 <= world.Height)
+				tiles.Add (world.GetTileAt (XCoord, YCoord + 1));
+			if (XCoord-1 >= 0 && YCoord-1 >= 0)
+				tiles.Add (world.GetTileAt (XCoord - 1, YCoord - 1));
+			if (YCoord-1 >= 0)
+				tiles.Add (world.GetTileAt (XCoord, YCoord - 1));
+		} else {
+			if (YCoord+1 <= world.Height)
+				tiles.Add (world.GetTileAt (XCoord, YCoord + 1));
+			if (XCoord+1 <= world.Width && YCoord+1 <= world.Height)
+				tiles.Add (world.GetTileAt (XCoord + 1, YCoord + 1));
+			if (YCoord-1 >= 0)
+				tiles.Add (world.GetTileAt (XCoord, YCoord - 1));
+			if (YCoord+1 <= world.Height && YCoord-1 >= 0)
+				tiles.Add (world.GetTileAt (XCoord + 1, YCoord - 1));
+		}
+
+		return (Tile[]) tiles.ToArray( typeof (Tile));	
 	}
 
     public void RegisterTileRedisplayCallback (Action<Tile> callback)

@@ -1,10 +1,10 @@
 ﻿using UnityEngine;
 using System.Collections;
+using System.Collections.Generic;
 using System;
 
 public class Tile {
 	public enum TileType {Empty, Terrian} ;
-
 	// local variables
 	TileType type;
 
@@ -50,13 +50,15 @@ public class Tile {
 		YCoord = y;
 	}
 
-	public Tile[] GetNeighbours() {
-		ArrayList tiles = new ArrayList();
+	public HashSet<Tile> GetNeighbours(int depth = 0) {
+		HashSet<Tile> tiles = new HashSet<Tile>();
+		Tile[] result;
+		tiles.Add (this);
 		if (XCoord-1 >= 0)
 			tiles.Add (world.GetTileAt (XCoord-1, YCoord));
 		if (XCoord+1 <= world.Width)
 			tiles.Add (world.GetTileAt (XCoord + 1, YCoord));
-		if (XCoord % 2 == 0) {
+		if (YCoord % 2 == 0) {
 			if (XCoord-1 >= 0 && YCoord+1 <= world.Height)
 				tiles.Add (world.GetTileAt (XCoord - 1, YCoord + 1));
 			if (YCoord+1 <= world.Height)
@@ -75,8 +77,15 @@ public class Tile {
 			if (YCoord+1 <= world.Height && YCoord-1 >= 0)
 				tiles.Add (world.GetTileAt (XCoord + 1, YCoord - 1));
 		}
-
-		return (Tile[]) tiles.ToArray( typeof (Tile));	
+		if (depth <= 0)
+			return tiles;
+		else {
+			foreach (Tile t in tiles) {
+				tiles.UnionWith (t.GetNeighbours(depth-1));
+			}
+			return tiles;
+		}
+		// return (Tile[]) tiles.ToArray( typeof (Tile));	
 	}
 
     public void RegisterTileRedisplayCallback (Action<Tile> callback)

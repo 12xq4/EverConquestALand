@@ -1,9 +1,11 @@
 ﻿using UnityEngine;
 using System.Collections;
+using System.Collections.Generic;
 
 public class Map : MonoBehaviour {
     // ----------------------------------------- Visual component ------------------------------------------------------------
     public GameObject hex_tile;
+	HashSet<Tile> neighbours;
 
     // ----------------------------------------- Logics component ------------------------------------------------------------
     // Keep a public instance of map here in case if other classes needs to refer to the map data.
@@ -17,6 +19,14 @@ public class Map : MonoBehaviour {
 	float z_offset = 1.57f; // this will be applied for every row.
 
 	// Use this for initialization
+	void OnEnable() {
+		MouseController.OnClicked += OnHexSelected;
+	}
+
+	void OnDisable() {
+		MouseController.OnClicked -= OnHexSelected;
+	}
+
 	void Start () {
         World = new World();
 
@@ -71,5 +81,24 @@ public class Map : MonoBehaviour {
         else
             Debug.Log("There is an error in the tile type");
     }
+
+	void OnHexSelected(Tile tl)
+	{
+
+		if (neighbours != null) {
+			foreach (Tile t in neighbours) {
+				GameObject tile_neighbour = GameObject.Find ("Hex (" + t.XCoord + "," + t.YCoord + ")");
+				if (tile_neighbour.GetComponentInChildren<MeshRenderer> () != null && tile_neighbour.GetComponentInChildren<MeshRenderer> ().material.color == Color.yellow)
+					tile_neighbour.GetComponentInChildren<MeshRenderer> ().material.color = Color.white;
+			}
+		}
+
+		neighbours = tl.GetNeighbours();
+		foreach (Tile t in neighbours) {
+			GameObject tile_neighbour = GameObject.Find ("Hex (" + t.XCoord + "," + t.YCoord + ")");
+			if (tile_neighbour.GetComponentInChildren<MeshRenderer> () != null && tile_neighbour.GetComponentInChildren<MeshRenderer> ().material.color == Color.white)
+				tile_neighbour.GetComponentInChildren<MeshRenderer> ().material.color = Color.yellow;
+		}
+	}
 }
 	

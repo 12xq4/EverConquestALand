@@ -3,6 +3,9 @@ using System.Collections;
 using UnityEngine.EventSystems;
 
 public class MouseController : MonoBehaviour {
+	public delegate void ClickEvent(Tile t);
+	public static event ClickEvent OnClicked;
+
     Vector3 lastClickPosition;
 	Vector3 currentClickPosition;
 	// Use this for initialization
@@ -62,6 +65,9 @@ public class MouseController : MonoBehaviour {
 
 		if (Input.GetMouseButtonDown(0))
 		{
+			if (OnClicked != null)
+				OnClicked (hitObject.transform.parent.transform.parent.GetComponent<Hex> ().tile_rep);
+			/*
 			MeshRenderer mr = hitObject.GetComponentInChildren<MeshRenderer>();
 			if (mr.material.color == Color.blue)
 				mr.material.color = Color.white;
@@ -75,6 +81,7 @@ public class MouseController : MonoBehaviour {
 				if (tile_neighbour != null && tile_neighbour.GetComponentInChildren<MeshRenderer>().material.color == Color.white)
 					tile_neighbour.GetComponentInChildren<MeshRenderer>().material.color = Color.yellow;
 			}
+			*/
 		}
 	}
 }

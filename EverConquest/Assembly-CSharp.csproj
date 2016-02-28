@@ -45,11 +45,14 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
+     <Compile Include="Assets\Scripts\Controller\GameManager.cs" />
      <Compile Include="Assets\Scripts\Controller\Hex.cs" />
      <Compile Include="Assets\Scripts\Controller\Map.cs" />
      <Compile Include="Assets\Scripts\Controller\MouseController.cs" />
+     <Compile Include="Assets\Scripts\Data_Model\Pawn.cs" />
      <Compile Include="Assets\Scripts\Data_Model\Tile.cs" />
      <Compile Include="Assets\Scripts\Data_Model\World.cs" />
+     <None Include="Assets\Standard Assets\Environment\Water (Basic)\Shaders\FXWaterBasic.shader" />
  <Reference Include="UnityEngine.UI">
  <HintPath>/Applications/Unity/Unity.app/Contents/UnityExtensions/Unity/GUISystem/UnityEngine.UI.dll</HintPath>
  </Reference>

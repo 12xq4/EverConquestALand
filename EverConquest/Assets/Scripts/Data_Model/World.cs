@@ -4,7 +4,6 @@ using System.Collections;
 public class World {
     Tile[,] tiles;
 
-
 	public int Width { get; set;}
 	public int Height { get; set;}
 
@@ -41,12 +40,6 @@ public class World {
         {
             Debug.Log("Check your coordinates, you requested a tile that is out of bound.");
         }
-		/*
-		if (tiles [x, y] == null)
-			Debug.Log ("Tile at " + x + "," + y + "is null");
-		else
-			Debug.Log ("Tile has been returned.");
-		*/
         return tiles[x,y];
     }
 }

@@ -13,6 +13,8 @@ public class Tile {
     // to change the graphics component of the tile, as well as changing the property of the tile.
     Action<Tile> cb_tileRedisplay;
 
+	public Pawn Owner { get; set;} // this keeps track of who is currently on top of this tile. This could be null.
+
     public TileType Type
     {
         get
@@ -21,12 +23,12 @@ public class Tile {
         }
         set
         {
-            TileType oldType = type;    // this is added ot keep track if a tile type has been changed.
+            // TileType oldType = type;    // this is added ot keep track if a tile type has been changed.
                                         // if tile actually changed, call redisplay method.
             type = value;
             // make sure the type has been changed, then call callback function.
-            if (oldType != type && cb_tileRedisplay != null)
-                cb_tileRedisplay(this);
+            // if (oldType != type && cb_tileRedisplay != null)
+            	cb_tileRedisplay(this);
         }
     }
     
@@ -52,7 +54,6 @@ public class Tile {
 
 	public HashSet<Tile> GetNeighbours(int depth = 0) {
 		HashSet<Tile> tiles = new HashSet<Tile>();
-		Tile[] result;
 		tiles.Add (this);
 		if (XCoord-1 >= 0)
 			tiles.Add (world.GetTileAt (XCoord-1, YCoord));
@@ -80,10 +81,12 @@ public class Tile {
 		if (depth <= 0)
 			return tiles;
 		else {
+			HashSet<Tile> newTiles = new HashSet<Tile>();
+			newTiles.Add (this);
 			foreach (Tile t in tiles) {
-				tiles.UnionWith (t.GetNeighbours(depth-1));
+				newTiles.UnionWith(t.GetNeighbours(depth-1));	
 			}
-			return tiles;
+			return newTiles;
 		}
 		// return (Tile[]) tiles.ToArray( typeof (Tile));	
 	}

@@ -5,7 +5,6 @@ using System.Collections.Generic;
 public class Map : MonoBehaviour {
     // ----------------------------------------- Visual component ------------------------------------------------------------
     public GameObject hex_tile;
-	HashSet<Tile> neighbours;
 
     // ----------------------------------------- Logics component ------------------------------------------------------------
     // Keep a public instance of map here in case if other classes needs to refer to the map data.
@@ -18,28 +17,19 @@ public class Map : MonoBehaviour {
 	float x_offset = 0.9f; // this is only applied once for every two rows
 	float z_offset = 1.57f; // this will be applied for every row.
 
-	// Use this for initialization
-	void OnEnable() {
-		MouseController.OnClicked += OnHexSelected;
-	}
-
-	void OnDisable() {
-		MouseController.OnClicked -= OnHexSelected;
-	}
-
 	void Start () {
         World = new World();
 
 		for (int x = 0; x < World.Width; x++) {
 			for (int z = 0; z < World.Height; z++) {
                 Tile tile_data = World.GetTileAt(x, z);
-                GameObject hex_current = new GameObject();
-                hex_current.name = "Hex (" + x + "," + z + ")";
+				Vector3 pos;
                 if (z % 2 == 1)
-					hex_current.transform.position = new Vector3(x * width_offset + x_offset,0,z * z_offset);
+					pos = new Vector3(x * width_offset + x_offset,0,z * z_offset);
 				else
-                    hex_current.transform.position = new Vector3(x * width_offset,0,z * z_offset);
-
+					pos = new Vector3(x * width_offset,0,z * z_offset);
+				GameObject hex_current = (GameObject) Instantiate(hex_tile, pos, Quaternion.identity);
+				hex_current.name = "Hex (" + x + "," + z + ")";
                 hex_current.isStatic = true;
 				// Add a hex component for each hex tile at run time.
 				// For ease of reference relativity.
@@ -53,6 +43,13 @@ public class Map : MonoBehaviour {
             }
 		}
         World.SetTilesAtRandom();
+
+		// for testing below, generate a player pawn.
+		GameObject player = GameObject.FindGameObjectWithTag("Character");
+		player.GetComponent<Characeter> ().Body = new Creature (World, 0, 0, 1, 2, 10, Creature.ArmorType.Cloth, Creature.WeaponType.Light, 1, 1);
+		GameObject o_pawn = GameObject.Find ("Hex (" + 0 + "," + 0 + ")");
+		player.transform.position = o_pawn.transform.position;
+
 	}
 	
 	// Update is called once per frame
@@ -62,43 +59,22 @@ public class Map : MonoBehaviour {
 
     void OnHexRedisplay(Tile tile_data, GameObject tile_current)
     {
-        if (tile_data.Type == Tile.TileType.Empty)
-        {
-            tile_current.transform.FindChild(hex_tile.name).gameObject.SetActive(false);
-        }
-            
-        else if (tile_data.Type == Tile.TileType.Terrian)
-        {
-            // Just do this right now as we only have 1 type of terrian. Later on we could add more types of terrian tiles, and
-            // change the MeshRender depending on the type of terrian that is presented.
-            if (tile_current.transform.FindChild(hex_tile.name) == null)
-            {
-                GameObject hex = (GameObject)Instantiate(hex_tile, tile_current.transform.position, Quaternion.identity);
-                hex.transform.SetParent(tile_current.transform, true);
-            }
-        }
-
+		/*
+		if (tile_current.transform.FindChild(hex_tile.name) == null)
+		{
+			GameObject hex = (GameObject)Instantiate(hex_tile, tile_current.transform.position, Quaternion.identity);
+			hex.transform.SetParent(tile_current.transform, true);
+		}
+		*/
+		if (tile_data.Type == Tile.TileType.Empty) {
+			tile_current.GetComponentInChildren<MeshRenderer> ().enabled = false;
+		} else if (tile_data.Type == Tile.TileType.Terrian) {
+			// Just do this right now as we only have 1 type of terrian. Later on we could add more types of terrian tiles, and
+			// change the MeshRender depending on the type of terrian that is presented.
+			tile_current.GetComponentInChildren<MeshRenderer> ().enabled = true;
+		}
         else
             Debug.Log("There is an error in the tile type");
     }
-
-	void OnHexSelected(Tile tl)
-	{
-
-		if (neighbours != null) {
-			foreach (Tile t in neighbours) {
-				GameObject tile_neighbour = GameObject.Find ("Hex (" + t.XCoord + "," + t.YCoord + ")");
-				if (tile_neighbour.GetComponentInChildren<MeshRenderer> () != null && tile_neighbour.GetComponentInChildren<MeshRenderer> ().material.color == Color.yellow)
-					tile_neighbour.GetComponentInChildren<MeshRenderer> ().material.color = Color.white;
-			}
-		}
-
-		neighbours = tl.GetNeighbours();
-		foreach (Tile t in neighbours) {
-			GameObject tile_neighbour = GameObject.Find ("Hex (" + t.XCoord + "," + t.YCoord + ")");
-			if (tile_neighbour.GetComponentInChildren<MeshRenderer> () != null && tile_neighbour.GetComponentInChildren<MeshRenderer> ().material.color == Color.white)
-				tile_neighbour.GetComponentInChildren<MeshRenderer> ().material.color = Color.yellow;
-		}
-	}
 }
 	

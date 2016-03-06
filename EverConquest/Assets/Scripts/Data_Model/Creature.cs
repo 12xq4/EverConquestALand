@@ -1,10 +1,19 @@
-﻿using UnityEngine;
+﻿/**
+ * The biggest problem regarding this class now is to have the units rebalanced
+ * Right now the armor bonus is way to powerful.
+ *  - one solution is to take away armor bouns. Could be good if this kind of balancing is left to the game design person.
+ * 	implement such bonus makes balancing occur at the fundamental logic level instead of at the data level.
+ */ 
+
+
+using UnityEngine;
 using System.Collections;
+using System.Collections.Generic;
 
 public class Creature : Moveable_Pawn {
 	public enum ArmorType
 	{
-		Cloth = 1, Leather = 2, Wooden = 4, Mail = 5, Plate = 6 
+		Cloth = 0, Leather = 1, Wooden = 2, Mail = 3, Plate = 4 
 	}
 
 	public enum WeaponType
@@ -15,7 +24,7 @@ public class Creature : Moveable_Pawn {
 	}
 
 	// Initialized attributes:
-	public float Hp { get; protected set;}
+	// public float Hp { get; protected set;}
 	public ArmorType Armor { get; protected set;}
 	public WeaponType Weapon { get; protected set;} 
 	public int Range { get; protected set;}
@@ -24,21 +33,10 @@ public class Creature : Moveable_Pawn {
 	// calculated attributes:
 	public float Atk { get; protected set;}
 	public float Def { get; protected set;}
-	public int speed = 0;
+	// public int speed = 0;
 
-	public int Speed {
-		get {
-			return speed;
-		}
-		set {
-			speed = value;
-		}
-	}
-
-	public Creature(World world, int location_x, int location_y, int area, int movement,
-		float hp, ArmorType armor, WeaponType weapon,float atk, float def, int range = 1) : base(world, location_x, location_y, area, movement) {
-
-		Hp = hp;
+	public Creature(World world, int location_x, int location_y, float hp, ArmorType armor, WeaponType weapon,
+		float atk, float def, int area, int movement, int range = 1) : base(world, location_x, location_y, hp, area, movement) {
 		Armor = armor;
 		Weapon = weapon;
 		Range = range;
@@ -70,6 +68,28 @@ public class Creature : Moveable_Pawn {
 		Def = def + (int)Armor;
 		Atk = atk;
 	}
+
+	public HashSet<Tile> GenerateRange() {
+		// Generate a list of possible hex to move to
+		Tile current_t = world.GetTileAt(Loc_X, Loc_Y);
+		HashSet<Tile> range = current_t.GetNeighbours (Range + area);
+		foreach (Tile t in Tiles_under)
+			range.Remove (t);
+		return range;
+	}
+
+	public bool CheckReach (Pawn other) {
+		HashSet<Tile> reachable_tile = GenerateRange(); 
+		bool reachable = false;
+		foreach (Tile t in other.Tiles_under) {
+			if (reachable_tile.Contains (t)) {
+				reachable = true;
+				break;
+			}
+		}
+		return reachable;
+	}
+
 	/**
 	 * This will calculate the damage dealt to a certain pawn
 	 * Weapon type and armor type will have a damage modifer.
@@ -84,51 +104,78 @@ public class Creature : Moveable_Pawn {
 	 */
 
 	public void Attack (Pawn other) {
-		if (other.GetType() == typeof(Creature)) {
-			Creature otherCreature = other as Creature;
-			float dmg = 0f;
-			if (Weapon == WeaponType.Piercing) {
-				dmg = Atk * (Random.value + 0.2f);
-				if (otherCreature.Armor == ArmorType.Leather)
-					dmg *= 1.3f;
-				else if (otherCreature.Armor == ArmorType.Plate)
-					dmg *= 0.7f;
-			}
+		// Check if the target is in range
+		if (CheckReach(other)) {
+			if (other.GetType () == typeof(Creature)) {
+				Creature otherCreature = other as Creature;
+				float dmg = 0f;
+				if (Weapon == WeaponType.Piercing) {
+					dmg = Atk * (Random.value + 0.2f);
+					if (otherCreature.Armor == ArmorType.Wooden)
+						dmg *= 1.3f;
+					else if (otherCreature.Armor == ArmorType.Plate)
+						dmg *= 0.7f;
+				}
 
-			if (Weapon == WeaponType.Light) {
-				dmg = Atk * (Random.value + 0.3f);
-				if (otherCreature.Armor == ArmorType.Cloth)
-					dmg *= 1.3f;
-				else if (otherCreature.Armor == ArmorType.Mail)
-					dmg *= 0.7f;
-			}
+				if (Weapon == WeaponType.Light) {
+					dmg = Atk * (Random.value + 0.3f);
+					if (otherCreature.Armor == ArmorType.Leather)
+						dmg *= 1.3f;
+					else if (otherCreature.Armor == ArmorType.Mail)
+						dmg *= 0.7f;
+				}
 
-			if (Weapon == WeaponType.Heavy) {
-				dmg = Atk * (Random.value + 0.2f);
-				if (otherCreature.Armor == ArmorType.Plate)
-					dmg *= 1.3f;
-				else if (otherCreature.Armor == ArmorType.Leather)
-					dmg *= 0.7f;
-			}
+				if (Weapon == WeaponType.Heavy) {
+					dmg = Atk * (Random.value + 0.2f);
+					if (otherCreature.Armor == ArmorType.Plate)
+						dmg *= 1.3f;
+					else if (otherCreature.Armor == ArmorType.Leather)
+						dmg *= 0.7f;
+				}
 
-			if (Weapon == WeaponType.Energy) {
-				dmg = Atk * (Random.value + 0.2f);
-				if (otherCreature.Armor == ArmorType.Mail)
-					dmg *= 1.3f;
-				else if (otherCreature.Armor == ArmorType.Cloth)
-					dmg *= 0.7f;
-			}
+				if (Weapon == WeaponType.Energy) {
+					dmg = Atk * (Random.value + 0.2f);
+					if (otherCreature.Armor == ArmorType.Mail)
+						dmg *= 1.3f;
+					else if (otherCreature.Armor == ArmorType.Wooden)
+						dmg *= 0.7f;
+				}
+				otherCreature.TakDmg (dmg);
+			} else if (other.GetType () == typeof(Structure)) {
+				// Haven't decided for structures yet.
+				Structure otherStruct = other as Structure;
+				float dmg = 0f;
+				if (Weapon == WeaponType.Piercing) {
+					dmg = Atk * (Random.value + 0.2f);
+				}
 
-			otherCreature.TakDmg (dmg);
-		} else if (other.GetType() == typeof(Structure)) {
-			// Haven't decided for structures yet.
-		} else {
-			Debug.Log ("Can't attack this Object.");
-		}
+				if (Weapon == WeaponType.Light) {
+					dmg = Atk * (Random.value + 0.3f);
+				}
+
+				if (Weapon == WeaponType.Heavy) {
+					dmg = Atk * (Random.value + 0.2f);
+				}
+
+				if (Weapon == WeaponType.Energy) {
+					dmg = Atk * (Random.value + 0.2f);
+				}
+				otherStruct.TakDmg (dmg);
+			} else {
+				Debug.Log ("Can't attack this Object.");
+			}
+		} else
+			Debug.Log ("Invalid target.");
 	}
 
 	public void TakDmg (float dmg) {
+		float rand = (float)(Random.value + 0.5);
+		
+		dmg -= Def * rand;
+		if (dmg < 0)
+			dmg = 0;
 		Hp -= dmg;
+		Hp = Mathf.Round(Hp * 10f) / 10f;
 		if (Hp <= 0) {
 			Hp = 0;
 			Debug.Log ("Object is dead.");

@@ -45,10 +45,20 @@ public class Map : MonoBehaviour {
         World.SetTilesAtRandom();
 
 		// for testing below, generate a player pawn.
-		GameObject player = GameObject.FindGameObjectWithTag("Character");
-		player.GetComponent<Characeter> ().Body = new Creature (World, 0, 0, 1, 2, 10, Creature.ArmorType.Cloth, Creature.WeaponType.Light, 1, 1);
+		GameObject player = GameObject.Find("Pawn (0,0)");
+		player.GetComponent<Characeter> ().Body = new Creature (World, 0, 0, 40, Creature.ArmorType.Cloth, Creature.WeaponType.Light, 8, 4, 0, 3, 3);
 		GameObject o_pawn = GameObject.Find ("Hex (" + 0 + "," + 0 + ")");
 		player.transform.position = o_pawn.transform.position;
+
+		GameObject enemy = GameObject.Find("Pawn (4,4)");
+		enemy.GetComponent<Characeter> ().Body = new Creature (World, 4, 4, 60, Creature.ArmorType.Mail, Creature.WeaponType.Piercing, 10, 1, 0, 2);
+		GameObject o_pawn2 = GameObject.Find ("Hex (" + 4 + "," + 4 + ")");
+		enemy.transform.position = o_pawn2.transform.position;
+
+		GameObject structure = GameObject.Find("Pawn (8,8)");
+		structure.GetComponent<Characeter> ().Body = new Structure (World, 8, 8, 60, 8, 5, 1, 2);
+		GameObject o_pawn3 = GameObject.Find ("Hex (" + 8 + "," + 8 + ")");
+		structure.transform.position = o_pawn3.transform.position;
 
 	}
 	
@@ -59,13 +69,6 @@ public class Map : MonoBehaviour {
 
     void OnHexRedisplay(Tile tile_data, GameObject tile_current)
     {
-		/*
-		if (tile_current.transform.FindChild(hex_tile.name) == null)
-		{
-			GameObject hex = (GameObject)Instantiate(hex_tile, tile_current.transform.position, Quaternion.identity);
-			hex.transform.SetParent(tile_current.transform, true);
-		}
-		*/
 		if (tile_data.Type == Tile.TileType.Empty) {
 			tile_current.GetComponentInChildren<MeshRenderer> ().enabled = false;
 		} else if (tile_data.Type == Tile.TileType.Terrian) {

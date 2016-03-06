@@ -52,7 +52,7 @@ public class Tile {
 		YCoord = y;
 	}
 
-	public HashSet<Tile> GetNeighbours(int depth = 0) {
+	public HashSet<Tile> GetNeighbours(int depth = 1) {
 		HashSet<Tile> tiles = new HashSet<Tile>();
 		tiles.Add (this);
 		if (XCoord-1 >= 0)
@@ -78,7 +78,7 @@ public class Tile {
 			if (YCoord+1 <= world.Height && YCoord-1 >= 0)
 				tiles.Add (world.GetTileAt (XCoord + 1, YCoord - 1));
 		}
-		if (depth <= 0)
+		if (depth <= 1)
 			return tiles;
 		else {
 			HashSet<Tile> newTiles = new HashSet<Tile>();

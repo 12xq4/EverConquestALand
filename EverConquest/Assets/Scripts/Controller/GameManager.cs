@@ -14,6 +14,7 @@ public class GameManager : MonoBehaviour {
 	[SerializeField] private MouseController m_mouseController;
 
 	HashSet<Tile> neighbours;
+	HashSet<Tile> target_range;
 	Creature pawn_piece;
 
 	void OnEnable() {
@@ -43,35 +44,11 @@ public class GameManager : MonoBehaviour {
 			GameObject pawn = GameObject.Find ("Pawn (" + tl.XCoord + "," + tl.YCoord + ")");
 			if (tl.Owner.GetType () == typeof(Creature)) {
 				pawn_piece = (Creature)tl.Owner;
-				neighbours = tl.GetNeighbours (pawn_piece.MoveStep - 1);
-				HexHighligh (neighbours);
+				neighbours = pawn_piece.GenerateMoves ();
+				target_range = pawn_piece.GenerateRange();
+				HexHighlight (neighbours, 1);
+				HexHighlight (target_range, 2);
 				MouseController.firstClick = true;
-				/*
-				if (Input.GetKey (KeyCode.Escape))
-					HexReset ();
-				else if (Input.GetMouseButtonDown(1) || Input.GetMouseButtonDown(2)) {
-					Debug.Log ("Button clicked twice");
-					Ray ray = Camera.main.ScreenPointToRay(Input.mousePosition);
-					RaycastHit hitInfo;
-
-					if (Physics.Raycast(ray, out hitInfo))
-					{
-						// ray hit something
-						// we would now detect what we hit.
-						GameObject hitObject = hitInfo.collider.transform.gameObject;
-						// This is a hack and it is dumb, have the hex script on the top level and hard code it to trace all the way back.
-						// Check if the object clicked is a type tile object.
-						if (hitObject.tag == "Tile") {
-							Tile destination = hitObject.transform.parent.transform.parent.GetComponent<Hex> ().tile_rep;
-							if (neighbours.Contains(destination)){ 		// Indicates that this is a valid tile to move to.
-								pawn_piece.Move(destination);
-								pawn.transform.Translate (hitObject.transform.position);
-							} else
-								Debug.Log("Can't move there.");
-						}
-					}
-				}
-				*/
 			} else {
 				Debug.Log ("Can't move this object.");
 			}
@@ -81,22 +58,51 @@ public class GameManager : MonoBehaviour {
 		if (tl.Owner == null && neighbours.Contains (tl)) {
 			GameObject tile = GameObject.Find ("Hex (" + tl.XCoord + "," + tl.YCoord + ")");
 			// Move the player there.
-			GameObject pawn_moved = GameObject.Find("Pawn (" + pawn_piece.Loc_X + "," + pawn_piece.Loc_Y + ")");
+			GameObject pawn_moved = GameObject.Find ("Pawn (" + pawn_piece.Loc_X + "," + pawn_piece.Loc_Y + ")");
 			pawn_piece.Move (tl);
 			pawn_moved.transform.position = tile.transform.position;
 			pawn_moved.name = "Pawn (" + pawn_piece.Loc_X + "," + pawn_piece.Loc_Y + ")";
 			Debug.Log ("Move selected");
+		} else if (tl.Owner != null && pawn_piece.CheckReach(tl.Owner)) {
+			// Compare the speed of two object to determine first strike, then call attack to deal with it.
+			if (tl.Owner.GetType () == typeof(Creature)) {
+				if (tl.Owner.Speed > pawn_piece.Speed) {
+					((Creature)tl.Owner).Attack (pawn_piece);
+					// Pawn retaliate if still alive.
+					if (pawn_piece.Hp > 0)
+						pawn_piece.Attack (tl.Owner);
+				} else {
+					pawn_piece.Attack (tl.Owner);
+					// Opponent retaliate if still alive.
+					if (tl.Owner.Hp > 0)
+						((Creature)tl.Owner).Attack (pawn_piece);
+				}
+			} else if (tl.Owner.GetType () == typeof(Structure)) {
+				pawn_piece.Attack (tl.Owner);
+				// Opponent retaliate if still alive.
+				if (tl.Owner.Hp > 0)
+					((Structure)tl.Owner).Attack (pawn_piece);
+			}
 		}
 
 		MouseController.firstClick = false;	
 		HexReset ();
 	}
 
-	void HexHighligh(HashSet<Tile> targets) {
+	void HexHighlight(HashSet<Tile> targets, int flag) {
 		foreach (Tile t in targets) {
 			GameObject tile = GameObject.Find ("Hex (" + t.XCoord + "," + t.YCoord + ")");
-			if (tile.GetComponentInChildren<MeshRenderer> () != null && tile.GetComponentInChildren<MeshRenderer> ().material.color == Color.white)
-				tile.GetComponentInChildren<MeshRenderer> ().material.color = Color.green;
+			if (tile.GetComponentInChildren<MeshRenderer> () != null) {
+				switch (flag) {
+				case 1:
+					tile.GetComponentInChildren<MeshRenderer> ().material.color = Color.green;
+					break;
+				case 2:
+					if (t.Owner != null && t.Owner != pawn_piece)
+						tile.GetComponentInChildren<MeshRenderer> ().material.color = Color.red;
+					break;
+				}
+			}
 		}
 	}
 
@@ -108,6 +114,15 @@ public class GameManager : MonoBehaviour {
 					tile.GetComponentInChildren<MeshRenderer> ().material.color = Color.white;
 			}
 			neighbours.Clear ();
+		}
+
+		if (target_range != null) {
+			foreach (Tile t in target_range) {
+				GameObject tile = GameObject.Find ("Hex (" + t.XCoord + "," + t.YCoord + ")");
+				if (tile.GetComponentInChildren<MeshRenderer> () != null && tile.GetComponentInChildren<MeshRenderer> ().material.color != Color.white)
+					tile.GetComponentInChildren<MeshRenderer> ().material.color = Color.white;
+			}
+			target_range.Clear ();
 		}
 	}
 }

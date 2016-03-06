@@ -6,7 +6,7 @@ public abstract class Moveable_Pawn : Pawn, Moveable {
 
 	public int MoveStep { get; protected set;}
 
-	public Moveable_Pawn(World world, int location_x, int location_y, int area, int movement = 1) : base(world, location_x, location_y, area)
+	public Moveable_Pawn(World world, int location_x, int location_y, float hp, int area, int movement = 1) : base(world, location_x, location_y, hp, area)
 	{
 		MoveStep = movement;
 	}
@@ -14,7 +14,12 @@ public abstract class Moveable_Pawn : Pawn, Moveable {
 	public HashSet<Tile> GenerateMoves() {
 		// Generate a list of possible hex to move to
 		Tile current_t = world.GetTileAt(Loc_X, Loc_Y);
-		HashSet<Tile> moves = current_t.GetNeighbours (MoveStep);
+		HashSet<Tile> moves = current_t.GetNeighbours (MoveStep + area);
+		/*
+		foreach (Tile t in Tiles_under)
+			moves.Remove (t);
+		*/
+		moves.RemoveWhere (s => s.Owner != null);
 		return moves;
 	}
 

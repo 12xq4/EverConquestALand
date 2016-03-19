@@ -46,17 +46,17 @@ public class Map : MonoBehaviour {
 
 		// for testing below, generate a player pawn.
 		GameObject player = GameObject.Find("Pawn (0,0)");
-		player.GetComponent<Characeter> ().Body = new Creature (World, 0, 0, 40, Creature.ArmorType.Cloth, Creature.WeaponType.Light, 8, 4, 0, 3, 3);
+		player.GetComponent<Character> ().Body = new Creature (World, 0, 0, 40, Creature.ArmorType.Cloth, Creature.WeaponType.Light, 8, 4, 0, 3, 3);
 		GameObject o_pawn = GameObject.Find ("Hex (" + 0 + "," + 0 + ")");
 		player.transform.position = o_pawn.transform.position;
 
 		GameObject enemy = GameObject.Find("Pawn (4,4)");
-		enemy.GetComponent<Characeter> ().Body = new Creature (World, 4, 4, 60, Creature.ArmorType.Mail, Creature.WeaponType.Piercing, 10, 1, 0, 2);
+		enemy.GetComponent<Character> ().Body = new Creature (World, 4, 4, 60, Creature.ArmorType.Mail, Creature.WeaponType.Piercing, 10, 1, 0, 2);
 		GameObject o_pawn2 = GameObject.Find ("Hex (" + 4 + "," + 4 + ")");
 		enemy.transform.position = o_pawn2.transform.position;
 
 		GameObject structure = GameObject.Find("Pawn (8,8)");
-		structure.GetComponent<Characeter> ().Body = new Structure (World, 8, 8, 60, 8, 5, 1, 2);
+		structure.GetComponent<Character> ().Body = new Structure (World, 8, 8, 60, 8, 5, 1, 2);
 		GameObject o_pawn3 = GameObject.Find ("Hex (" + 8 + "," + 8 + ")");
 		structure.transform.position = o_pawn3.transform.position;
 

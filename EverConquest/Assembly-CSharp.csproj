@@ -46,7 +46,8 @@
   </ItemGroup>
   <ItemGroup>
      <Compile Include="Assets\Art Asset\Standard Assets\Environment\Water (Basic)\Scripts\WaterBasic.cs" />
-     <Compile Include="Assets\Scripts\Controller\Characeter.cs" />
+     <Compile Include="Assets\Scripts\Art\UI_Panel.cs" />
+     <Compile Include="Assets\Scripts\Controller\Character.cs" />
      <Compile Include="Assets\Scripts\Controller\GameManager.cs" />
      <Compile Include="Assets\Scripts\Controller\Hex.cs" />
      <Compile Include="Assets\Scripts\Controller\Map.cs" />

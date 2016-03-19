@@ -8,6 +8,7 @@ public class MouseController : MonoBehaviour {
 	public static event ClickEvent SelectMove;
 
 	public static bool firstClick = false;
+	public LayerMask mask;
 
     Vector3 lastClickPosition;
 	Vector3 currentClickPosition;
@@ -32,7 +33,7 @@ public class MouseController : MonoBehaviour {
         Ray ray = Camera.main.ScreenPointToRay(Input.mousePosition);
         RaycastHit hitInfo;
         
-        if (Physics.Raycast(ray, out hitInfo))
+        if (Physics.Raycast(ray, out hitInfo, 100, mask))
         {
 
 			currentClickPosition = hitInfo.point;
@@ -56,7 +57,7 @@ public class MouseController : MonoBehaviour {
 
 		Ray ray2 = Camera.main.ScreenPointToRay(Input.mousePosition);
 		RaycastHit hitInfo2;
-		if (Physics.Raycast (ray2, out hitInfo2)) {
+		if (Physics.Raycast (ray2, out hitInfo2, 100, mask)) {
 			lastClickPosition = hitInfo2.point;
 			lastClickPosition.y = 0;
 		}
